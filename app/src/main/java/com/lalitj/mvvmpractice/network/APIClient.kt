@@ -17,7 +17,7 @@ object APIClient {
                     chain.request().newBuilder()
                         .addHeader("Content-Type", "application/json")
                         .addHeader("Ocp-Apim-Subscription-Key", "223f900e901a4a61baedc803eef5153b")
-                        .addHeader("sessionId", "")
+                        .addHeader("sessionId", "2H4RL537D46FC1C57046AA7E4EAE9C84AE34A/9194171/9d4493e716153642/0")
                         .build()
                 chain.proceed(request)
             }
