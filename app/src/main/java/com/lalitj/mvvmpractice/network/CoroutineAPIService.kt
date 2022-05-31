@@ -2,12 +2,13 @@ package com.lalitj.mvvmpractice.network
 
 import org.altruist.BajajExperia.Models.CommunicationRequestListDTO
 import org.altruist.BajajExperia.Models.SMSCommunicationDTO
-import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Url
 
-interface APIInterface {
+interface CoroutineAPIService {
     @POST("SMSCommunication")
-    suspend fun getCommunicationList(@Body communicationRequestListDTO: CommunicationRequestListDTO): Response<SMSCommunicationDTO>
+    suspend fun fetchCommunicationsSMS(
+        @Body communicationRequestListDTO: CommunicationRequestListDTO
+    ): Result<SMSCommunicationDTO>
 }

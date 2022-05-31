@@ -6,10 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.lalitj.mvvmpractice.R
+import com.lalitj.mvvmpractice.databinding.RequestListCommunicationItemLayoutBinding
 import com.lalitj.mvvmpractice.models.RaisedCommunicationResponseDTO
-import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -25,10 +25,13 @@ class CommunicationListAdapter(
         parent: ViewGroup,
         viewType: Int
     ): RequestListCommunicationItemHolder {
-        val v = LayoutInflater.from(parent.context)
-            .inflate(R.layout.request_list_communication_item_layout, parent, false)
+        val binding = RequestListCommunicationItemLayoutBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return RequestListCommunicationItemHolder(
-            v
+            binding
         )
     }
 
@@ -38,7 +41,7 @@ class CommunicationListAdapter(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: RequestListCommunicationItemHolder, position: Int) {
-
+//        holder.binding.communication = requestList[position]
         holder.tvSMStext.text =
             if (!requestList[position].SMStext.isNullOrEmpty() || requestList[position].SMStext != "")
                 "${requestList[position].SMStext}\n[${requestList[position].eventCaptureDate}]"
@@ -55,7 +58,7 @@ class CommunicationListAdapter(
 
         }
 
-        holder.imvCollapseclose.visibility = View.GONE
+        /*holder.imvCollapseclose.visibility = View.GONE
         if (flag_pos == position) {
             holder.tvSMStext.maxLines = Integer.MAX_VALUE;
             holder.imvCollapse.visibility = View.GONE;
@@ -88,14 +91,15 @@ class CommunicationListAdapter(
                 holder.tvSMStext.scrollTo(0, scrollAmount)
             else
                 holder.tvSMStext.scrollTo(0, 0)
-        }
+        }*/
     }
 
-    class RequestListCommunicationItemHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var tvSMStext: TextView = view.findViewById(R.id.tv_SMStext)
-        var tveventCaptureDate: TextView = view.findViewById(R.id.tv_eventCaptureDate)
-        var imvCollapse: TextView = view.findViewById(R.id.imv_collapse)
-        var imvCollapseclose: TextView = view.findViewById(R.id.imv_collapse_close)
+    class RequestListCommunicationItemHolder(val binding: RequestListCommunicationItemLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        var tvSMStext: TextView = binding.tvSMStext
+        var tveventCaptureDate: TextView = binding.tvEventCaptureDate
+        var imvCollapse: TextView = binding.imvCollapse
+        var imvCollapseclose: TextView = binding.imvCollapseClose
 
     }
 
@@ -142,4 +146,21 @@ class CommunicationListAdapter(
         }
         return null
     }
+}
+
+class CommunicationAdapterCallBack : DiffUtil.ItemCallback<RaisedCommunicationResponseDTO>() {
+    override fun areItemsTheSame(
+        oldItem: RaisedCommunicationResponseDTO,
+        newItem: RaisedCommunicationResponseDTO
+    ): Boolean {
+        return oldItem.SMStext == newItem.SMStext
+    }
+
+    override fun areContentsTheSame(
+        oldItem: RaisedCommunicationResponseDTO,
+        newItem: RaisedCommunicationResponseDTO
+    ): Boolean {
+        return oldItem == newItem
+    }
+
 }

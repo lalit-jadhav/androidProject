@@ -9,41 +9,53 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lalitj.mvvmpractice.adapters.CommunicationListAdapter
+import com.lalitj.mvvmpractice.databinding.ActivityMainBinding
 import com.lalitj.mvvmpractice.models.RaisedCommunicationResponseDTO
 import com.lalitj.mvvmpractice.network.Result
 import com.lalitj.mvvmpractice.viewmodel.MainViewModel
-import kotlinx.android.synthetic.main.activity_main.*
+import dagger.hilt.android.AndroidEntryPoint
+import org.altruist.BajajExperia.Models.SMSCommunicationDTO
+import org.json.JSONTokener
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     lateinit var communicationListAdapter: CommunicationListAdapter
     var communicationList: MutableList<RaisedCommunicationResponseDTO> = mutableListOf()
+    @Inject lateinit var viewModel: MainViewModel
+    private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setUpCommunicationAdapter()
-        MainViewModel().getCommunicationList().observe(this, Observer {
-            when (it) {
-                is Result.Success<*> -> {
+//        val viewModel = MainViewModel()
+        binding.lifecycleOwner = this
+        viewModel.fetchList()
+        viewModel.communicationData.observe(this, Observer { result ->
+            when (result) {
+                is Result.Loading -> {
+                    if (result.isLoading)
+                        binding.pbLoader.visibility = View.VISIBLE
+                    else
+                        binding.pbLoader.visibility = View.GONE
+                }
+                is Result.Success -> {
+                    val smsCommunicationDTO = result.data as SMSCommunicationDTO
                     communicationList.clear()
-                    communicationList.addAll(it.data as MutableList<RaisedCommunicationResponseDTO>)
+                    smsCommunicationDTO.finalList?.let { it1 -> communicationList.addAll(it1) }
                     communicationListAdapter.notifyDataSetChanged()
-                    pb_loader.visibility = View.GONE
+                    binding.pbLoader.visibility = View.GONE
                 }
                 is Result.SessionExpired -> {
-                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
-                    pb_loader.visibility = View.GONE
+                    Toast.makeText(this, result.message, Toast.LENGTH_LONG).show()
+                    binding.pbLoader.visibility = View.GONE
                 }
                 is Result.ActivityResult -> TODO()
                 is Result.Empty -> TODO()
                 is Result.Error -> {
-                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
-                    pb_loader.visibility = View.GONE
-                }
-                is Result.Loading -> {
-                    if(it.isLoading)
-                        pb_loader.visibility = View.VISIBLE
-                    else
-                        pb_loader.visibility = View.GONE
+                    Toast.makeText(this, result.message, Toast.LENGTH_LONG).show()
+                    binding.pbLoader.visibility = View.GONE
                 }
                 is Result.Retry -> TODO()
             }
@@ -54,9 +66,9 @@ class MainActivity : AppCompatActivity() {
         val layoutManager
                 : RecyclerView.LayoutManager =
             LinearLayoutManager(this)
-        rv_request_list.layoutManager = layoutManager
-        rv_request_list.itemAnimator = DefaultItemAnimator()
+        binding.rvRequestList.layoutManager = layoutManager
+        binding.rvRequestList.itemAnimator = DefaultItemAnimator()
         communicationListAdapter = CommunicationListAdapter(this, communicationList)
-        rv_request_list.adapter = communicationListAdapter
+        binding.rvRequestList.adapter = communicationListAdapter
     }
 }

@@ -15,7 +15,9 @@ data class SMSCommunicationDTO(
     @SerializedName("transData")
     var transData: @RawValue List<RaisedCommunicationResponseDTO>? = null,
     @SerializedName("promoData")
-    var promoData: @RawValue List<RaisedCommunicationResponseDTO>? = null
+    var promoData: @RawValue List<RaisedCommunicationResponseDTO>? = null,
+    @SerializedName("finalList")
+    var finalList: @RawValue List<RaisedCommunicationResponseDTO>? = null
 
 ) : Parcelable
 //{
